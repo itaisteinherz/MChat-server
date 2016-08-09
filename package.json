@@ -1,0 +1,22 @@
+{
+  "name": "neo4j-test",
+  "version": "1.0.0",
+  "description": "A test project using the neo4j graph database",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "neo4j",
+    "database",
+    "javascript"
+  ],
+  "author": "Itai Steinherz",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.10.2",
+    "socket.io": "^1.4.8",
+    "neo4j-driver": "1.0.2",
+    "db": "1.0.0"
+  }
+}
