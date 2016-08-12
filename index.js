@@ -41,7 +41,7 @@ io.on('connection', function(socket) {
 
     socket.on('available_peers_changed', function(data) {
         console.log("Changing available peers of device...");
-        db.changeAvailablePeers(user.UUID, user.passphrase, data.change, data.isAddition, data.fullList, data.updateVersion, function() {
+        db.changeAvailablePeers(data.UUID, data.passphrase, data.change, data.isAddition, data.fullList, data.updateVersion, function() {
             console.log("Changed available peers of device successfully");
         }, function(err) {
             console.log(`Error changing available peers of device:\n${err}`);
