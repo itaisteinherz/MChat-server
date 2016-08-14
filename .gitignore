@@ -1,8 +1,7 @@
 .DS_Store
-/neo4j/
-express/
-neo4j-driver/
-socket.io/
+neo4j/
+node_modules/*
+!node_modules/db/
 
 # Xcode
 .xcuserdata/*
