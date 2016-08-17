@@ -25,6 +25,16 @@ io.on('connection', function(socket) {
         });
     });
 
+    socket.on('get_connected_peers', function(data) {
+        console.log("Getting connected peers...");
+        db.getConnectedPeers(data['UUID'], data['passphrase'], function(result) {
+            console.log(`Got ${result['connectedPeers']} connected peers`);
+            socket.emit('resolved_peers', result['connectedPeers']['low']);
+        }, function(err) {
+            console.log(`Error getting connected peers:\n${err}`);
+        });
+    });
+
     socket.on('get_nickname_for_uuid', function(uuid) {
         console.log("Getting nickname...");
         db.getNicknameForUUID(uuid, function(result) {
@@ -49,11 +59,11 @@ io.on('connection', function(socket) {
     });
 
     socket.on('disconnect', function() {
+        console.log('A user disconnected');
         db.disconnectDevice(user.UUID, function() {
             console.log("Disconnected device successfully");
         }, function(err) {
             console.log(`Error disconnecting device:\n${err}`);
         });
-        console.log('A user disconnected');
     });
 });
