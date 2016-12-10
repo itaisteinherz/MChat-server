@@ -1,22 +1,35 @@
 {
-  "name": "neo4j-test",
+  "name": "mchat-server",
   "version": "1.0.0",
-  "description": "A test project using the neo4j graph database",
-  "main": "index.js",
+  "description": "The server side for the MChat app",
+  "main": "src/index.js",
+  "dependencies": {
+    "express": "^4.14.0",
+    "neo4j-driver": "^1.0.4",
+    "socket.io": "^1.5.1"
+  },
+  "devDependencies": {
+    "eslint": "^3.10.2",
+    "mocha": "^3.1.2"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon src/index.js",
+    "lint": "./node_modules/.bin/eslint '{*.js,src/**/*.js,test/**/*.js}'; exit 0",
+    "test": "./node_modules/mocha/bin/mocha --harmony; exit 0",
+    "create-cert": "sh test/scripts/create-cert.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itaisteinherz/MChat-server.git"
   },
   "keywords": [
-    "neo4j",
-    "database",
-    "javascript"
+    "node.js",
+    "javascript",
+    "neo4j"
   ],
   "author": "Itai Steinherz",
-  "license": "ISC",
-  "dependencies": {
-    "db": "1.0.0",
-    "express": "^4.10.2",
-    "socket.io": "^1.4.8",
-    "neo4j-driver": "^1.0.2"
-  }
+  "bugs": {
+    "url": "https://github.com/itaisteinherz/MChat-server/issues"
+  },
+  "homepage": "https://github.com/itaisteinherz/MChat-server#readme"
 }
