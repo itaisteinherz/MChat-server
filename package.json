@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "dependencies": {
     "express": "^4.14.0",
+    "forever": "^0.15.3",
     "neo4j-driver": "^1.0.4",
     "socket.io": "^1.5.1"
   },
@@ -13,7 +14,7 @@
     "mocha": "^3.1.2"
   },
   "scripts": {
-    "start": "nodemon src/index.js",
+    "start": "./node_modules/.bin/forever start src/index.js",
     "lint": "./node_modules/.bin/eslint '{*.js,src/**/*.js,test/**/*.js}'; exit 0",
     "test": "./node_modules/mocha/bin/mocha --harmony; exit 0",
     "create-cert": "sh test/scripts/create-cert.sh"
