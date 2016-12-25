@@ -3,20 +3,23 @@
   "version": "1.0.0",
   "description": "The server side for the MChat app",
   "main": "src/index.js",
+  "directories": {
+    "test": "test"
+  },
   "dependencies": {
     "express": "^4.14.0",
     "forever": "^0.15.3",
-    "neo4j-driver": "^1.0.4",
-    "socket.io": "^1.5.1"
+    "neo4j-driver": "^1.0.5",
+    "socket.io": "^1.7.2"
   },
   "devDependencies": {
-    "eslint": "^3.10.2",
-    "mocha": "^3.1.2"
+    "eslint": "^3.12.2",
+    "mocha": "^3.2.0"
   },
   "scripts": {
-    "start": "./node_modules/.bin/forever start src/index.js",
-    "lint": "./node_modules/.bin/eslint '{*.js,src/**/*.js,test/**/*.js}'; exit 0",
-    "test": "./node_modules/mocha/bin/mocha --harmony; exit 0",
+    "start": "forever start src/index.js",
+    "lint": "eslint {*.js,src/**/*.js,test/**/*.js}",
+    "test": "npm run lint; mocha --harmony --check-leaks",
     "create-cert": "sh test/scripts/create-cert.sh"
   },
   "repository": {
@@ -28,7 +31,7 @@
     "javascript",
     "neo4j"
   ],
-  "author": "Itai Steinherz",
+  "author": "Itai Steinherz <itaisteinherz@gmail.com>",
   "bugs": {
     "url": "https://github.com/itaisteinherz/MChat-server/issues"
   },
