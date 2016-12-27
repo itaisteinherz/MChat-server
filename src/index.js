@@ -29,7 +29,7 @@ io.on("connection", function(socket) {
                 peers[connectionDevice.UUID] = socket;
                 isValidSource = true; // TODO: Check if this is needed or not
             })
-            .cactch((err) => {
+            .catch((err) => {
                 log(`Error loading device:\n${err}`);
             });
     });
