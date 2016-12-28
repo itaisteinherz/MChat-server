@@ -1,5 +1,6 @@
 {
   "name": "mchat-server",
+  "private": true,
   "version": "1.0.0",
   "description": "The server side for the MChat app",
   "main": "src/index.js",
