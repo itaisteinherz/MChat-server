@@ -29,9 +29,8 @@ module.exports = class DB {
         });
     }
 
-    /* eslint-disable no-unused-vars */
+    // eslint-disable-next-line no-unused-vars
     changeAvailablePeers(device, change, isAddition, fullList, updateVersion) { // TODO: Add support for versioning.
-        /* eslint-enable no-unused-vars */
         return _runIfValidDevice(this.neo4j, device)
             .then(() => {
                 if (isAddition) {
