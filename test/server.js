@@ -1,5 +1,3 @@
-/* eslint-disable no-undef */
-
 const assert = require("assert"),
     Server = require("../src/server.js"),
     serverConfig = require("../config.json")["server"];

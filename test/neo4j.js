@@ -1,5 +1,3 @@
-/* eslint-disable no-undef */
-
 const assert = require("assert"),
     databaseConfig = require("../config.json")["database"],
     Neo4j = require("../src/db/neo4j.js");

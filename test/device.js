@@ -1,5 +1,3 @@
-/* eslint-disable no-undef */
-
 const assert = require("assert"),
     Device = require("../src/objects/device.js");
 
