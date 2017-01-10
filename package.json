@@ -20,7 +20,7 @@
   "scripts": {
     "start": "forever start src/index.js",
     "lint": "eslint {*.js,src/**/*.js,test/**/*.js}",
-    "test": "npm run lint; mocha --harmony --check-leaks",
+    "test": "npm run lint; mocha --harmony",
     "create-cert": "sh test/scripts/create-cert.sh"
   },
   "repository": {
