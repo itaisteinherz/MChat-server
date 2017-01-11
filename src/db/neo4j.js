@@ -12,14 +12,12 @@ module.exports = class Neo4j {
     run(statement, params) {
         var session = this._driver.session();
 
-        return new Promise((resolve, reject) => {
-            session
-                .run(statement, params)
-                .then((result) => {
-                    session.close();
-                    resolve(_parseData(result));
-                }).catch(reject);
-        });
+        return session
+            .run(statement, params)
+            .then((result) => {
+                session.close();
+                return _parseData(result);
+            });
     }
 
     closeDriver() { // TODO: Check if I have a better solution for this. Also, check if putting the code inside of a promise makes it any better.
