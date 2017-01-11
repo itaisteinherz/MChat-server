@@ -1,7 +1,7 @@
 const Server = require("./server.js"),
     Device = require("./objects/device.js"),
     config = require("../config.json"),
-    log = require("./log");
+    log = require("./log.js");
 
 const server = new Server(config["server"]);
 
