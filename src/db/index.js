@@ -180,7 +180,7 @@ function _runIfValidDevice(driver, device) { // TODO: Merge all of the function'
 
     return driver.run(deviceStatement, deviceParams)
         .then((result) => {
-            return new Promise(function(resolve, reject) { // TODO: Check if this is a good solution. Also, find better solution for running if asked to run statement if device is valid before device finishes registration. Also, fix issue where would ask for connected peers count before registration is finished.
+            return new Promise((resolve, reject) => { // TODO: Check if this is a good solution. Also, find better solution for running if asked to run statement if device is valid before device finishes registration. Also, fix issue where would ask for connected peers count before registration is finished.
                 if (result["passphrase"] == device.passphrase || (Object.keys(result).length === 0 && result.constructor === Object)) {
                     resolve();
                 } else {
