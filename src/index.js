@@ -6,7 +6,7 @@ const Server = require("./server.js"),
 const server = new Server(config["server"]);
 
 server.load.then(() => {
-    console.log(`Listening on *:${config["server"]["httpPort"]}, *:${config["server"]["httpsPort"]}`);
+    log(`Listening on *:${config["server"]["httpPort"]}, *:${config["server"]["httpsPort"]}`);
 });
 
 const DB = require("./db/index.js"),
