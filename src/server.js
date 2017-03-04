@@ -1,14 +1,8 @@
-const pem = require("pem");
-const pify = require("pify");
 const express = require("express");
 
 const url = require("url");
 const http = require("http");
 const https = require("https");
-
-const pemP = pify(pem, Promise); // TODO: Check if the second argument is necessarys
-
-const host = "mchat.com";
 
 // Exports
 
@@ -43,43 +37,7 @@ module.exports = class Server {
         const httpsServerPromise = new Promise((resolve) => {
             const httpsApp = express();
                 
-            if (!options["key"] || !options["cert"]) {
-                let caRootCert;
-                
-                pemP.createCertificate({
-                    days: 1,
-                    selfSigned: true
-                })
-                    .then((caKeys) => {
-                        const caRootKey = caKeys.serviceKey;
-                        
-                        caRootCert = caKeys.certificate;
-
-                        return pemP.createCertificate({
-                            serviceCertificate: caRootCert,
-                            serviceKey: caRootKey,
-                            serial: Date.now(),
-                            days: 500,
-                            country: "",
-                            state: "",
-                            locality: "",
-                            organization: "",
-                            organizationUnit: "",
-                            commonName: host
-                        });
-                    })
-                    .then((keys) => {
-                        let httpsOptions = Object.assign({}, options, {
-                            key: keys.clientKey,
-                            cert: keys.certificate,
-                            ca: caRootCert
-                        });
-                        
-                        this._httpsServer = https.createServer(httpsOptions, httpsApp).listen(options["httpsPort"], resolve);
-                    });
-            } else {
-                this._httpsServer = https.createServer(options, httpsApp).listen(options["httpsPort"], resolve);
-            }
+            this._httpsServer = https.createServer(options, httpsApp).listen(options["httpsPort"], resolve);
         });
 
         this._load = Promise.all([httpServerPromise, httpsServerPromise]);

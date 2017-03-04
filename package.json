@@ -11,13 +11,13 @@
     "express": "^4.14.0",
     "forever": "^0.15.3",
     "neo4j-driver": "^1.0.5",
-    "pem": "^1.9.4",
-    "pify": "^2.3.0",
     "socket.io": "^1.7.2"
   },
   "devDependencies": {
     "eslint": "^3.12.2",
     "mocha": "^3.2.0",
+    "pem": "^1.9.4",
+    "pify": "^2.3.0",
     "socket.io-client": "^1.7.3",
     "uuid": "^3.0.1"
   },

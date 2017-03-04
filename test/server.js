@@ -17,8 +17,7 @@ const host = "mchat.com";
 
 let testServer;
 let caRootCert;
-let key;
-let cert;
+let sslOptions = {};
 
 describe("Server", function() {
     before("create ssl key and cert", function() {
@@ -45,14 +44,14 @@ describe("Server", function() {
                 });
             })
             .then((keys) => {
-                key = keys.clientKey;
-                cert = keys.certificate;
+                sslOptions["key"] = keys.clientKey;
+                sslOptions["cert"] = keys.certificate;
             });
     });
     
     describe("#constructor(options)", function() {
         it("should return a new server object", function() {
-            testServer = new Server(Object.assign({}, serverConfig, {key, cert}));
+            testServer = new Server(Object.assign({}, serverConfig, sslOptions));
             assert.equal(testServer instanceof Server, true);
 
             return testServer.load;
