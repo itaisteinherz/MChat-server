@@ -1,18 +1,14 @@
-module.exports = class Device {
-    constructor() { // NOTE: This function can take one argument - a JSON object containing all of the information, or three arguments - one for each property.
-        if (arguments.length === 1) { // TODO: Check if this is the best solution for taking multiple types of arguments.
-            if (!arguments[0]["nickname"]) {
-                this._nickname = "";
-            } else {
-                this._nickname = arguments[0]["nickname"];
-            }
+module.exports = class Device { // TODO: Check if I even need to set getters and setters (in all files).
+    constructor(nickname, uuid, passphrase) {
+        if (arguments.length === 1 && typeof arguments[0] === "object") {
+            this._nickname = arguments[0]["nickname"] || "";
             this._UUID = arguments[0]["UUID"];
             this._passphrase = arguments[0]["passphrase"];
-        } else {
-            this._nickname = arguments[0];
-            this._UUID = arguments[1];
-            this._passphrase = arguments[2];
         }
+        
+        this._nickname = nickname;
+        this._UUID = uuid;
+        this._passphrase = passphrase;
     }
 
     get nickname() {

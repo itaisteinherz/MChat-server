@@ -10,7 +10,7 @@ module.exports = class Neo4j {
     }
 
     run(statement, params) {
-        var session = this._driver.session();
+        const session = this._driver.session();
 
         return session
             .run(statement, params)
@@ -35,15 +35,15 @@ function _parseData(input) { // TODO: Add tests for this function.
         return;
     }
 
-    var data = {},
-        record, key;
-    for (record of input["records"]) {
-        for (key of record["keys"]) { // TODO: Check if this works when there's no "keys" property, but just an "columns" property (the "columns" property appears in the web GUI).
-            var fieldIndex = record["_fieldLookup"][key],
-                newData;
+    let data = {};
+
+    for (const record of input["records"]) {
+        for (const key of record["keys"]) { // TODO: Check if this works when there's no "keys" property, but just an "columns" property (the "columns" property appears in the web GUI).
+            const fieldIndex = record["_fieldLookup"][key];
+            let newData;
 
             if (data[key]) {
-                var fieldData = data[key] instanceof Array ? data[key] : [data[key]];
+                let fieldData = data[key] instanceof Array ? data[key] : [data[key]];
 
                 newData = record["_fields"].slice(fieldIndex, fieldIndex + 1);
                 if (newData instanceof Array && newData.length > 1) {

@@ -1,22 +1,91 @@
-const assert = require("assert"),
-    Server = require("../src/server.js"),
-    serverConfig = require("../config.json")["server"];
+const pem = require("pem");
+const pify = require("pify");
 
-var testServer;
+const io = require("socket.io");
+const socket = require("socket.io-client");
 
-describe("Server", function() { // TODO: Check how to write tests for the other getters - and if it's even needed. If it is, then I need to write the tests.
+const assert = require("assert");
+const http = require("http");
+const https = require("https");
+
+const Server = require("../src/server.js");
+const serverConfig = require("../config.json")["server"];
+
+const pemP = pify(pem, Promise); // TODO: Check if the second argument is necessary
+
+const host = "mchat.com";
+
+let testServer;
+let caRootCert;
+let key;
+let cert;
+
+describe("Server", function() {
+    before("create ssl key and cert", function() {
+        return pemP.createCertificate({
+            days: 1,
+            selfSigned: true
+        })
+            .then((caKeys) => {
+                const caRootKey = caKeys.serviceKey;
+                
+                caRootCert = caKeys.certificate;
+
+                return pemP.createCertificate({
+                    serviceCertificate: caRootCert,
+                    serviceKey: caRootKey,
+                    serial: Date.now(),
+                    days: 500,
+                    country: "",
+                    state: "",
+                    locality: "",
+                    organization: "",
+                    organizationUnit: "",
+                    commonName: host
+                });
+            })
+            .then((keys) => {
+                key = keys.clientKey;
+                cert = keys.certificate;
+            });
+    });
+    
     describe("#constructor(options)", function() {
         it("should return a new server object", function() {
-            testServer = new Server(serverConfig);
+            testServer = new Server(Object.assign({}, serverConfig, {key, cert}));
             assert.equal(testServer instanceof Server, true);
 
             return testServer.load;
         });
     });
 
-    describe("#get load()", function() {
+    describe("#get load()", function() { // TODO: Add tests for the http -> https redirect
         it("should return the promise that resolves when the server was started successfully", function() {
             assert.equal(testServer.load instanceof Promise, true);
+            
+            return testServer.load
+                .then(() => {
+                    const testIO = io(testServer.httpsServer); // eslint-disable-line no-unused-vars
+                    
+                    const client = socket(`https://localhost:${serverConfig["httpsPort"]}`, {
+                        ca: caRootCert,
+                        extraHeaders: {host}
+                    });
+                    
+                    return pify(client.on("connect"));
+                });
+        });
+    });
+
+    describe("#get httpServer()", function() {
+        it("should return the http server", function() {
+            assert.equal(testServer.httpServer instanceof http.Server, true);
+        });
+    });
+
+    describe("#get httpsServer()", function() {
+        it("should return the https server", function() {
+            assert.equal(testServer.httpsServer instanceof https.Server, true);
         });
     });
 });

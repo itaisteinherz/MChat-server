@@ -1,7 +1,8 @@
-const assert = require("assert"),
-    Device = require("../src/objects/device.js");
+const assert = require("assert");
 
-var testDevice;
+const Device = require("../src/objects/device.js");
+
+let testDevice, secondTestDevice;
 
 describe("Device", function() {
     describe("#constructor(nickname, UUID, passphrase)", function() {
@@ -9,15 +10,16 @@ describe("Device", function() {
             testDevice = new Device("nickname", "UUID", "passphrase");
             assert.equal(testDevice instanceof Device, true);
         });
-    });
+        
+        it("should return a new device object using the given data", function() {
+            const data = {
+                nickname: "nickname",
+                UUID: "UUID",
+                passphrase: "passphrase"
+            };
 
-    describe("#serialize()", function() {
-        it("should return a JSON object containing all of the device's properties", function() {
-            const serializedJSON = testDevice.serialize();
-
-            assert.equal(serializedJSON["nickname"], "nickname");
-            assert.equal(serializedJSON["UUID"], "UUID");
-            assert.equal(serializedJSON["passphrase"], "passphrase");
+            secondTestDevice = new Device(data);
+            assert.equal(secondTestDevice instanceof Device, true);
         });
     });
 
@@ -59,4 +61,22 @@ describe("Device", function() {
             assert.equal(testDevice.passphrase, "newPassphrase");
         });
     });
+
+    describe("#serialize()", function() {
+        it("should return a JSON object containing all of the device's properties", function() {
+            const serializedJSON = testDevice.serialize();
+            
+            assert.equal(serializedJSON["nickname"], "newNickname");
+            assert.equal(serializedJSON["UUID"], "newUUID");
+            assert.equal(serializedJSON["passphrase"], "newPassphrase");
+        });
+    });
 });
+
+
+
+
+
+
+
+

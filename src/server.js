@@ -1,26 +1,28 @@
-const fs = require("fs"),
-    url = require("url"),
-    http = require("http"),
-    https = require("https"),
-    path = require("path");
-
+const pem = require("pem");
+const pify = require("pify");
 const express = require("express");
+
+const url = require("url");
+const http = require("http");
+const https = require("https");
+
+const pemP = pify(pem, Promise); // TODO: Check if the second argument is necessarys
+
+const host = "mchat.com";
 
 // Exports
 
-module.exports = class Server { // TODO: Check wether I should use a class or a dictinary as the exports.
+module.exports = class Server {
     constructor(options) { // TODO: Make this function better.
         // HTTP Server
 
         const httpServerPromise = new Promise((resolve, reject) => {
             try {
-                this._httpApp = express();
+                const httpApp = express();
 
-                this._httpServer = http.createServer(this._httpApp).listen(options["httpPort"], () => {
-                    resolve();
-                });
+                this._httpServer = http.createServer(httpApp).listen(options["httpPort"], resolve);
 
-                this._httpApp.all("*", function(req, res) {
+                httpApp.all("*", (req, res) => {
                     const newURL = url.format({ // TODO: Improve this solution.
                         protocol: "https:",
                         hostname: req.hostname,
@@ -38,25 +40,45 @@ module.exports = class Server { // TODO: Check wether I should use a class or a 
 
         // HTTPS Server
 
-        const httpsServerPromise = new Promise((resolve, reject) => {
-            try {
-                this._httpsApp = express();
+        const httpsServerPromise = new Promise((resolve) => {
+            const httpsApp = express();
+                
+            if (!options["key"] || !options["cert"]) {
+                let caRootCert;
+                
+                pemP.createCertificate({
+                    days: 1,
+                    selfSigned: true
+                })
+                    .then((caKeys) => {
+                        const caRootKey = caKeys.serviceKey;
+                        
+                        caRootCert = caKeys.certificate;
 
-                const sslOptions = {
-                    rejectUnauthorized: false, // NOTE: This is temporary
-                    key: fs.readFileSync(path.join(__dirname, "../", options["key"])),
-                    cert: fs.readFileSync(path.join(__dirname, "../", options["cert"]))
-                };
-
-                if (options["ca"]) { // TODO: Check if this should be an if or added in the above object directly.
-                    sslOptions["ca"] = fs.readFileSync(path.join(__dirname, "../", options["ca"]));
-                }
-
-                this._httpsServer = https.createServer(sslOptions, this._httpsApp).listen(options["httpsPort"], () => {
-                    resolve();
-                });
-            } catch (e) {
-                reject(e);
+                        return pemP.createCertificate({
+                            serviceCertificate: caRootCert,
+                            serviceKey: caRootKey,
+                            serial: Date.now(),
+                            days: 500,
+                            country: "",
+                            state: "",
+                            locality: "",
+                            organization: "",
+                            organizationUnit: "",
+                            commonName: host
+                        });
+                    })
+                    .then((keys) => {
+                        let httpsOptions = Object.assign({}, options, {
+                            key: keys.clientKey,
+                            cert: keys.certificate,
+                            ca: caRootCert
+                        });
+                        
+                        this._httpsServer = https.createServer(httpsOptions, httpsApp).listen(options["httpsPort"], resolve);
+                    });
+            } else {
+                this._httpsServer = https.createServer(options, httpsApp).listen(options["httpsPort"], resolve);
             }
         });
 
@@ -65,14 +87,6 @@ module.exports = class Server { // TODO: Check wether I should use a class or a 
 
     get load() {
         return this._load;
-    }
-
-    get httpApp() {
-        return this._httpApp;
-    }
-
-    get httpsApp() {
-        return this._httpsApp;
     }
 
     get httpServer() {

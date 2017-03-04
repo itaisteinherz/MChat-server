@@ -1,8 +1,11 @@
-const assert = require("assert"),
-    databaseConfig = require("../config.json")["database"],
-    Neo4j = require("../src/db/neo4j.js");
+const assert = require("assert");
 
-var testNeo4j;
+const databaseConfig = require("../config.json")["database"];
+const Neo4j = require("../src/db/neo4j.js");
+
+const testName = "Jon Stewart";
+
+let testNeo4j;
 
 describe("Neo4j", function() { // TODO: Add tests for the internal _parseData function
     describe("#constructor(options)", function() {
@@ -15,13 +18,11 @@ describe("Neo4j", function() { // TODO: Add tests for the internal _parseData fu
     describe("#run(statement, params)", function() {
         it("should run the given statement and return a promise", function() {
             const params = {
-                name: "Jon Stewart"
+                name: testName
             };
 
             return testNeo4j.run("MERGE (p:TestPerson {name: {name}}) RETURN p.name AS name", params)
-                .then(function(result) {
-                    assert.equal(result["name"], "Jon Stewart");
-                });
+                .then((result) => assert.equal(result["name"], testName));
         });
     });
 
@@ -35,7 +36,7 @@ describe("Neo4j", function() { // TODO: Add tests for the internal _parseData fu
         testNeo4j = new Neo4j(databaseConfig); // NOTE: This is done since in the last test we close the driver, and so we need to re-open it.
 
         const params = {
-            name: "Jon Stewart"
+            name: testName
         };
 
         return testNeo4j.run("MATCH (p:TestPerson {name: {name}}) DELETE p", params)

@@ -1,16 +1,18 @@
-const assert = require("assert"),
-    DB = require("../src/db/index.js"),
-    Neo4j = require("../src/db/neo4j.js"),
-    Device = require("../src/objects/device.js"),
-    databaseConfig = require("../config.json")["database"];
+const { v4: uuid } = require("uuid");
 
-var testNeo4j,
-    testDatabase, testDevice, otherTestDevice;
+const assert = require("assert");
+
+const DB = require("../src/db/index.js");
+const Neo4j = require("../src/db/neo4j.js");
+const Device = require("../src/objects/device.js");
+const databaseConfig = require("../config.json")["database"];
+
+let testNeo4j, testDatabase, testDevice, otherTestDevice;
 
 describe("DB", function() {
     before("initialize and clear database", function() { // NOTE: This runs before all tests in this block.
-        testDevice = new Device("John Doe", "6c5f7d07-5cb6-4396-4c1145cd419b-TEST", "1c516501-c984-44e3-911e-b0e6c07187ef");
-        otherTestDevice = new Device("Jony Ive", "08372fb3-d3a3-490a-3ab479f7366f-TEST", "3d4e31df-c6c9-4c67-9e1c-fc774da1bb77");
+        testDevice = new Device("John Doe", `${uuid()}-TEST`, uuid());
+        otherTestDevice = new Device("Jony Ive", `${uuid()}-TEST`, uuid());
         testNeo4j = new Neo4j(databaseConfig);
 
         return testNeo4j.run("MATCH (device:Device {uuid: {uuid}}), (otherDevice:Device {uuid: {otherUUID}}) DETACH DELETE device", {
@@ -32,7 +34,23 @@ describe("DB", function() {
         });
     });
 
-    describe("#changeAvailablePeers(device, change, isAddition, fullList, updateVersion)", function() { // TODO: Make this test nicer. Also, add a test for when only one device is removed, and not all.
+    describe("#changeNickname(device, newNickname)", function() {
+        it("should change the given device's nickname", function() {
+            testDevice.nickname = "John Appleseed"; // NOTE: This is only for the assertion later on.
+
+            return testDatabase.changeNickname(testDevice, testDevice.nickname)
+                .then(function() {
+                    return testNeo4j.run("MATCH (d:Device {uuid: {uuid}}) RETURN d.nickname AS newNickname", { // TODO: Check if the OPTIONAL keyword is needed.
+                        uuid: testDevice.UUID
+                    });
+                })
+                .then(function(result) {
+                    assert.equal(result["newNickname"], testDevice.nickname);
+                });
+        });
+    });
+
+    describe("#changeAvailablePeers(device, change, isAddition, fullList, updateVersion)", function() { // TODO: Make this test nicer. Also, add a test for when only one device is removed, and not all. Make the test messages more accurate.
         it("should remove the given device's connected peers", function() {
             const statement = `MATCH (device:Device {uuid: {uuid}})
                                CREATE (otherDevice:Device {uuid: {otherUUID}, nickname: {otherNickname}, passphrase: {otherPassphrase}})
@@ -59,7 +77,7 @@ describe("DB", function() {
                 });
         });
 
-        it("should change the given device's connected peers", function() {
+        it("should change the given device's connected peers", function() { // TODO: Add assertion for the other device's UUID
             return testDatabase.changeAvailablePeers(testDevice, otherTestDevice.UUID, true, [otherTestDevice.UUID], 1)
                 .then(function() {
                     return testNeo4j.run("MATCH (d:Device {uuid: {uuid}})-[r:SEES]->(:Device) RETURN count(r) AS rels", {

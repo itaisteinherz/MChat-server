@@ -4,9 +4,7 @@
     },
     "server": {
         "httpPort": 1080,
-        "httpsPort": 1443,
-        "key": "test/ssl/privkey.pem",
-        "cert": "test/ssl/fullchain.pem"
+        "httpsPort": 1443
     },
     "database": {
         "username": "neo4j",

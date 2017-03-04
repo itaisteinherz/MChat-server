@@ -8,25 +8,23 @@ module.exports = class DB {
     }
 
     loadDevice(device) { // TODO: Make the promise structure valid.
-        return new Promise((resolve, reject) => {
-            _mergeDeviceIntoDatabase(this.neo4j, device).then((result) => {
-                if (result["passphrase"] == device.passphrase) {
-                    if (result["nickname"] != device.nickname) {
-                        _changeNicknameForUUID(this.neo4j, device)
-                            .then(() => {
-                                // Code to run when nickname is changed...
-                                resolve();
-                                return;
-                            }).catch(reject);
-                    }
-
-                    // Code to run for valid device...
-                    resolve();
-                } else {
-                    reject("Error: Invalid device passphrase entered.");
+        return _mergeDeviceIntoDatabase(this.neo4j, device).then((result) => {
+            if (result["passphrase"] == device.passphrase) {
+                if (result["nickname"] != device.nickname) {
+                    return _changeNicknameForUUID(this.neo4j, device, device.nickname);
                 }
-            }).catch(reject);
+
+                // Code to run for valid device...
+                return Promise.resolve();
+            } else {
+                return Promise.reject("Error: Invalid device passphrase entered.");
+            }
         });
+    }
+
+    changeNickname(device, newNickname) { // TODO: Check if I should accept the new nickname as another parameter, instead of accepting the updated device object.
+        return _runIfValidDevice(this.neo4j, device)
+            .then(() => _changeNicknameForUUID(this.neo4j, device, newNickname));
     }
 
     // eslint-disable-next-line no-unused-vars
@@ -35,7 +33,7 @@ module.exports = class DB {
             .then(() => {
                 if (isAddition) {
                     return _addDeviceSeeingDevice(this.neo4j, device, change);
-                } else if (change == "" && fullList.length == 0) {
+                } else if (change === "" && fullList.length === 0) {
                     return _removeAllDevicecSeenByDevice(this.neo4j, device);
                 } else {
                     return _removeDeviceSeeingDevice(this.neo4j, device, change);
@@ -55,36 +53,32 @@ module.exports = class DB {
                 };
 
                 return this.neo4j.run(peersStatement, peersParams);
-            }).then((data) => {
-                return _turnIntoArray(data, "connectedPeers");
-            });
+            }).then((data) => Promise.resolve(_turnIntoArray(data, "connectedPeers")));
     }
 
     getConnectedPeersNicknames(device) {
         return _runIfValidDevice(this.neo4j, device)
             .then(() => {
                 const peersStatement = `MATCH (device:Device {uuid: {uuid}})
-                                            OPTIONAL MATCH (device)-[:SEES*]-(devices) 
-                                            WHERE NOT devices.uuid = {uuid}
-                                            WITH DISTINCT devices AS peers
-                                            RETURN peers.nickname AS connectedPeersNicknames`; // TODO: Check if the OPTIONAL keyword is needed.
+                                        OPTIONAL MATCH (device)-[:SEES*]-(devices) 
+                                        WHERE NOT devices.uuid = {uuid}
+                                        WITH DISTINCT devices AS peers
+                                        RETURN peers.nickname AS connectedPeersNicknames`; // TODO: Check if the OPTIONAL keyword is needed.
                 const peersParams = {
                     uuid: device.UUID
                 };
 
                 return this.neo4j.run(peersStatement, peersParams);
             })
-            .then((data) => {
-                return _turnIntoArray(data, "connectedPeersNicknames"); // TODO: Check if this is a good solution for returning the processed array.
-            });
+            .then((data) => _turnIntoArray(data, "connectedPeersNicknames")); // TODO: Check if this is a good solution for returning the processed array.
     }
 
     getConnectedPeersCount(device) { // TODO: Convert this function to propper promise structure.
         return _runIfValidDevice(this.neo4j, device)
             .then(() => {
                 const peersStatement = `MATCH (device:Device {uuid: {uuid}})-[:SEES*]-(devices:Device)
-                                            WHERE NOT devices.uuid = {uuid}
-                                            RETURN count(DISTINCT devices) AS connectedPeers`;
+                                        WHERE NOT devices.uuid = {uuid}
+                                        RETURN count(DISTINCT devices) AS connectedPeers`;
                 const peersParams = {
                     uuid: device.UUID
                 };
@@ -95,10 +89,10 @@ module.exports = class DB {
 
     disconnectDevice(uuid) { // TODO: Find a better solution than the WITH dummy statement.
         const deviceStatement = `MATCH (device:Device {uuid: {uuid}})
-                                SET device.updateVersion = 1 WITH device.updateVersion as updateVersion
-                                MATCH (device)-[rel:SEES]->(:Device)
-                                WHERE NOT rel IS NULL
-                                DELETE rel`;
+                                 SET device.updateVersion = 1 WITH device.updateVersion as updateVersion
+                                 MATCH (device)-[rel:SEES]->(:Device)
+                                 WHERE NOT rel IS NULL
+                                 DELETE rel`;
         const deviceParams = {
             uuid: uuid
         };
@@ -127,12 +121,12 @@ function _mergeDeviceIntoDatabase(driver, device) {
     return driver.run(deviceStatement, deviceParams);
 }
 
-function _changeNicknameForUUID(driver, device) {
+function _changeNicknameForUUID(driver, device, newNickname) {
     const nicknameStatement = `MATCH (device:Device {uuid: {uuid}})
-                               SET device.nickname = {nickname}`;
+                               SET device.nickname = {newNickname}`;
     const nicknameParams = {
         uuid: device.UUID,
-        nickname: device.nickname
+        newNickname
     };
 
     return driver.run(nicknameStatement, nicknameParams);
@@ -162,8 +156,8 @@ function _removeDeviceSeeingDevice(driver, device, otherDeviceUUID) {
 
 function _removeAllDevicecSeenByDevice(driver, device) {
     const deviceStatement = `MATCH (device:Device {uuid: {uuid}})-[rel:SEES]->(:Device)
-                            WHERE NOT rel IS NULL
-                            DELETE rel`;
+                             WHERE NOT rel IS NULL
+                             DELETE rel`;
     const deviceParams = {
         uuid: device.UUID
     };
@@ -180,13 +174,11 @@ function _runIfValidDevice(driver, device) { // TODO: Merge all of the function'
 
     return driver.run(deviceStatement, deviceParams)
         .then((result) => {
-            return new Promise((resolve, reject) => { // TODO: Check if this is a good solution. Also, find better solution for running if asked to run statement if device is valid before device finishes registration. Also, fix issue where would ask for connected peers count before registration is finished.
-                if (result["passphrase"] == device.passphrase || (Object.keys(result).length === 0 && result.constructor === Object)) {
-                    resolve();
-                } else {
-                    reject("Error: Invalid device passphrase entered.");
-                }
-            });
+            if (result["passphrase"] == device.passphrase || (Object.keys(result).length === 0 && result.constructor === Object)) { // TODO: Check if this is a good solution. Also, find better solution for running if asked to run statement if device is valid before device finishes registration. Also, fix issue where would ask for connected peers count before registration is finished.
+                return Promise.resolve();
+            } else {
+                return Promise.reject("Error: Invalid device passphrase entered.");
+            }
         });
 }
 
