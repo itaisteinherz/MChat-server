@@ -42,7 +42,7 @@ io.on("connection", (socket) => {
 
         database.getConnectedPeers(socketDevice)
             .then((connectedPeers) =>
-                connectedPeers.forEach((peer) => peer.emit("receive_message", {
+                connectedPeers.forEach((peer) => peers[peer].emit("receive_message", {
                     "nickname": socketDevice.nickname,
                     "UUID": socketDevice.UUID,
                     "message": data["message"]
