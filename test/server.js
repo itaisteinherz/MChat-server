@@ -9,7 +9,7 @@ const http = require("http");
 const https = require("https");
 
 const Server = require("../src/server.js");
-const serverConfig = require("../config.json")["server"];
+const serverConfig = require("../config")["server"];
 
 const pemP = pify(pem, Promise); // TODO: Check if the second argument is necessary
 

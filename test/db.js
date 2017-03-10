@@ -5,7 +5,7 @@ const assert = require("assert");
 const DB = require("../src/db/index.js");
 const Neo4j = require("../src/db/neo4j.js");
 const Device = require("../src/objects/device.js");
-const databaseConfig = require("../config.json")["database"];
+const databaseConfig = require("../config")["database"];
 
 let testNeo4j, testDatabase, testDevice, otherTestDevice;
 
