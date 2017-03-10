@@ -1,14 +1,12 @@
 module.exports = class Device { // TODO: Check if I even need to set getters and setters (in all files).
-    constructor(nickname, uuid, passphrase) {
-        if (arguments.length === 1 && typeof arguments[0] === "object") {
-            this._nickname = arguments[0]["nickname"] || "";
-            this._UUID = arguments[0]["UUID"];
-            this._passphrase = arguments[0]["passphrase"];
+    constructor(options) {
+        if (arguments.length === 1 && typeof options === "object") {
+            this._nickname = options["nickname"] || "";
+            this._UUID = options["UUID"];
+            this._passphrase = options["passphrase"];
+        } else {
+            [this._nickname, this._UUID, this._passphrase] = arguments;
         }
-        
-        this._nickname = nickname;
-        this._UUID = uuid;
-        this._passphrase = passphrase;
     }
 
     get nickname() {

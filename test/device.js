@@ -10,7 +10,7 @@ describe("Device", function() {
             testDevice = new Device("nickname", "UUID", "passphrase");
             assert.equal(testDevice instanceof Device, true);
         });
-        
+
         it("should return a new device object using the given data", function() {
             const data = {
                 nickname: "nickname",

@@ -20,7 +20,7 @@ io.on("connection", (socket) => {
     isValidSource = userAgent.indexOf(config.client.appName) == 0 && userAgent.indexOf("Darwin") > -1; // TODO: Make sure that this is a valid check for the user agent. Also, check if I can convert this into a RegExp.
 
     socket.on("device_connected", (data) => {
-        connectionDevice = Device.deviceFromData(data);
+        connectionDevice = new Device(data);
 
         database.loadDevice(connectionDevice)
             .then(() => {
@@ -31,14 +31,14 @@ io.on("connection", (socket) => {
     });
 
     socket.on("change_nickname", (data) => {
-        const socketDevice = new Device("", data["UUID"], data["passphrase"]);
+        const socketDevice = new Device(data);
 
         database.changeNickname(socketDevice, data["newNickname"])
             .catch((err) => log(`Error updating nickname of device:\n${err}`));
     });
 
     socket.on("send_message", (data) => {
-        const socketDevice = new Device("", data["UUID"], data["passphrase"]);
+        const socketDevice = new Device(data);
 
         database.getConnectedPeers(socketDevice)
             .then((connectedPeers) =>
@@ -52,7 +52,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("get_connected_peers_count", (data) => {
-        const socketDevice = new Device("", data["UUID"], data["passphrase"]);
+        const socketDevice = new Device(data);
 
         database.getConnectedPeersCount(socketDevice) // TODO: Fix issue where getting connected peers count fails because registration wasn't finished yet, and so the error is: "TypeError: Cannot read property 'passphrase' of undefined"
             .then((result) => socket.emit("resolved_peers_count", result["connectedPeers"]["low"]))
@@ -62,7 +62,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("get_connected_peers_nicknames", (data) => {
-        const socketDevice = new Device("", data["UUID"], data["passphrase"]);
+        const socketDevice = new Device(data);
 
         database.getConnectedPeersNicknames(socketDevice)
             .then((connectedPeersNicknames) => socket.emit("resolved_nicknames", connectedPeersNicknames))
@@ -72,7 +72,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("available_peers_changed", (data) => {
-        const socketDevice = new Device("", data["UUID"], data["passphrase"]);
+        const socketDevice = new Device(data);
 
         database.changeAvailablePeers(socketDevice, data["change"], data["isAddition"], data["fullList"], data["updateVersion"])
             .catch((err) => log(`Error changing available peers of device:\n${err}`));
