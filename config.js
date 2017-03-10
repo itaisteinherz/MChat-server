@@ -22,13 +22,9 @@ module.exports = {
 };
 
 function readFile(pathToFile) {
-    if (exists(pathToFile)) {
+    if (fs.existsSync(path.join(__dirname, pathToFile))) {
         return fs.readFileSync(path.join(__dirname, pathToFile), {encoding: "utf8"});
     } else {
         return "";
     } 
-}
-
-function exists(pathToFile) {
-    return fs.existsSync(path.join(__dirname, pathToFile));
 }
