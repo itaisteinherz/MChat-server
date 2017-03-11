@@ -28,7 +28,7 @@ module.exports = class DB {
     }
 
     // eslint-disable-next-line no-unused-vars
-    changeAvailablePeers(device, change, isAddition, fullList, updateVersion) { // TODO: Add support for versioning.
+    changeAvailablePeers(device, change, isAddition, fullList, updateVersion) { // TODO: Add support for versioning. Also, fix bug where if someone who isn't using MChat is a MC advertiser and users of MChat discover him, the `MATCH` statements in the cypher queries would fail.
         return _runIfValidDevice(this.neo4j, device)
             .then(() => {
                 if (isAddition) {

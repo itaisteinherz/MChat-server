@@ -79,7 +79,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("disconnect", () => {
-        if (!isValidSource) {
+        if (!isValidSource || typeof connectionDevice === "undefined") { // TODO: Check if there's a better solution for ignoring a socket's disconnect if it didn't connect properly.
             return;
         }
 
