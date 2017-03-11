@@ -1,16 +1,19 @@
 const Server = require("./server.js");
 const DB = require("./db/index.js");
 const Device = require("./objects/device.js");
-const config = require("../config");
 const log = require("./log.js");
 
-const server = new Server(config["server"]);
+const config = require("../config");
+
 const io = require("socket.io")(server.httpsServer);
+const server = new Server(config["server"]);
 const database = new DB(config["database"]);
 
 let peers = new Map();
 
-server.load.then(() => log(`Listening on *:${config["server"]["httpPort"]}, *:${config["server"]["httpsPort"]}`));
+server.load
+    .then(() => log(`Listening on *:${config["server"]["httpPort"]}, *:${config["server"]["httpsPort"]}`))
+    .catch((err) => log(`Error loading the server:\n${err}`));
 
 io.on("connection", (socket) => {
     let connectionDevice, isValidSource;
@@ -41,13 +44,13 @@ io.on("connection", (socket) => {
         const socketDevice = new Device(data);
 
         database.getConnectedPeers(socketDevice)
-            .then((connectedPeers) =>
+            .then((connectedPeers) => {
                 connectedPeers.forEach((peer) => peers.get(peer).emit("receive_message", {
                     "nickname": socketDevice.nickname,
                     "UUID": socketDevice.UUID,
                     "message": data["message"]
-                }))
-            )
+                }));
+            })
             .catch((err) => log(`Error sending message:\n${err}`));
     });
 
@@ -56,9 +59,7 @@ io.on("connection", (socket) => {
 
         database.getConnectedPeersCount(socketDevice) // TODO: Fix issue where getting connected peers count fails because registration wasn't finished yet, and so the error is: "TypeError: Cannot read property 'passphrase' of undefined"
             .then((result) => socket.emit("resolved_peers_count", result["connectedPeers"]["low"]))
-            .catch((err) => {
-                log(`Error getting connected peers:\n${JSON.stringify(err, null, 2)}`);
-            });
+            .catch((err) => log(`Error getting connected peers:\n${JSON.stringify(err, null, 2)}`));
     });
 
     socket.on("get_connected_peers_nicknames", (data) => {
@@ -66,9 +67,7 @@ io.on("connection", (socket) => {
 
         database.getConnectedPeersNicknames(socketDevice)
             .then((connectedPeersNicknames) => socket.emit("resolved_nicknames", connectedPeersNicknames))
-            .catch((err) => {
-                log(`Error getting nicknames for UUID:\n${err}`);
-            });
+            .catch((err) => log(`Error getting nicknames for UUID:\n${err}`));
     });
 
     socket.on("available_peers_changed", (data) => {
