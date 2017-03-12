@@ -185,7 +185,7 @@ function _runIfValidDevice(driver, device) { // TODO: Merge all of the function'
 function _turnIntoArray(data, subscript) {
     if (!data || !data[subscript]) {
         return [];
-    } else if (Array.isArray(data[subscript)) {
+    } else if (Array.isArray(data[subscript])) {
         return data[subscript];
     } else {
         return [data[subscript]];
