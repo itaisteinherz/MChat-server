@@ -5,8 +5,8 @@ const log = require("./log.js");
 
 const config = require("../config");
 
-const io = require("socket.io")(server.httpsServer);
 const server = new Server(config["server"]);
+const io = require("socket.io")(server.httpsServer);
 const database = new DB(config["database"]);
 
 let peers = new Map();
