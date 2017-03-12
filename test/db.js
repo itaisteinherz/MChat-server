@@ -94,7 +94,7 @@ describe("DB", function() {
         it("should return the given device's connected peers", function() {
             return testDatabase.getConnectedPeers(testDevice)
                 .then(function(result) {
-                    assert.equal(result instanceof Array, true); // TODO: Check wether I should use instanceof Array or Array.isArray
+                    assert.equal(Array.isArray(result), true);
                     assert.equal(result[0], otherTestDevice.UUID);
                     assert.equal(result.length, 1);
                 });
@@ -105,7 +105,7 @@ describe("DB", function() {
         it("should return the connected peers' nicknames", function() {
             return testDatabase.getConnectedPeersNicknames(testDevice)
                 .then(function(result) {
-                    assert.equal(result instanceof Array, true); // TODO: Check wether I should use instanceof Array or Array.isArray
+                    assert.equal(Array.isArray(result), true);
                     assert.equal(result[0], otherTestDevice.nickname);
                     assert.equal(result.length, 1);
                 });

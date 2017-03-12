@@ -43,19 +43,19 @@ function _parseData(input) { // TODO: Add tests for this function.
             let newData;
 
             if (data[key]) {
-                let fieldData = data[key] instanceof Array ? data[key] : [data[key]];
+                let fieldData = Array.isArray(data[key]) ? data[key] : [data[key]];
 
                 newData = record["_fields"].slice(fieldIndex, fieldIndex + 1);
-                if (newData instanceof Array && newData.length > 1) {
+                if (Array.isArray(newData) && newData.length > 1) {
                     fieldData = fieldData.concat(newData);
                 } else {
-                    fieldData.push(newData instanceof Array ? newData[0] : newData);
+                    fieldData.push(Array.isArray(newData) ? newData[0] : newData);
                 }
 
                 data[key] = fieldData;
             } else {
                 newData = record["_fields"].slice(fieldIndex, fieldIndex + 1);
-                data[key] = newData instanceof Array && newData.length == 1 ? newData[0] : newData;
+                data[key] = Array.isArray(newData) && newData.length == 1 ? newData[0] : newData;
             }
         }
     }
