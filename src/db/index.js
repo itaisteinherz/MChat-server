@@ -33,10 +33,10 @@ module.exports = class DB {
             .then(() => {
                 if (isAddition) {
                     return _addDeviceSeeingDevice(this.neo4j, device, change);
-                } else if (change === "" && fullList.length === 0) {
-                    return _removeAllDevicecSeenByDevice(this.neo4j, device);
-                } else {
+                } else if (fullList.length > 0) {
                     return _removeDeviceSeeingDevice(this.neo4j, device, change);
+                } else {
+                    return _removeAllDevicecSeenByDevice(this.neo4j, device);
                 }
             });
     }
@@ -174,7 +174,7 @@ function _runIfValidDevice(driver, device) { // TODO: Merge all of the function'
 
     return driver.run(deviceStatement, deviceParams)
         .then((result) => {
-            if (result["passphrase"] == device.passphrase || (Object.keys(result).length === 0 && result.constructor === Object)) { // TODO: Check if this is a good solution. Also, find better solution for running if asked to run statement if device is valid before device finishes registration. Also, fix issue where would ask for connected peers count before registration is finished.
+            if (result["passphrase"] === device.passphrase || (Object.keys(result).length === 0 && result.constructor === Object)) { // TODO: Check if this is a good solution. Also, find better solution for running if asked to run statement if device is valid before device finishes registration. Also, fix issue where would ask for connected peers count before registration is finished.
                 return Promise.resolve();
             } else {
                 return Promise.reject("Error: Invalid device passphrase entered.");

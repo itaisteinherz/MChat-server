@@ -18,8 +18,7 @@ server.load
 io.on("connection", (socket) => {
     let connectionDevice, isValidSource;
 
-    const rawHeaders = socket.client.request.rawHeaders;
-    const userAgent = rawHeaders[rawHeaders.indexOf("User-Agent") + 1]; // TODO: Check if I should lower case these strings. Also, move to using a RegExp.
+    const userAgent = socket.request.headers["user-agent"]; // TODO: Check if I should lower case these strings. Also, move to using a RegExp.
     isValidSource = userAgent.indexOf(config.client.appName) == 0 && userAgent.indexOf("Darwin") > -1; // TODO: Make sure that this is a valid check for the user agent. Also, check if I can convert this into a RegExp.
 
     socket.on("device_connected", (data) => {
@@ -29,8 +28,14 @@ io.on("connection", (socket) => {
             .then(() => {
                 peers.set(connectionDevice.UUID, socket);
                 isValidSource = true; // TODO: Check if this is needed or not
+                
+                socket.emit("connect_status", {success: true});
             })
-            .catch((err) => log(`Error loading device:\n${err}`));
+            .catch((err) => {
+                socket.emit("connect_status", {success: false});
+                
+                log(`Error loading device:\n${err}`);
+            });
     });
 
     socket.on("change_nickname", (data) => {
