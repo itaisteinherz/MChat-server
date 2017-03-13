@@ -11,8 +11,8 @@ let testNeo4j, testDatabase, testDevice, otherTestDevice;
 
 describe("DB", function() {
     before("initialize and clear database", function() { // NOTE: This runs before all tests in this block.
-        testDevice = new Device("John Doe", `${uuid()}-TEST`, uuid());
-        otherTestDevice = new Device("Jony Ive", `${uuid()}-TEST`, uuid());
+        testDevice = new Device("John Doe", `TEST-${uuid()}`, uuid());
+        otherTestDevice = new Device("Jony Ive", `TEST-${uuid()}`, uuid());
         testNeo4j = new Neo4j(databaseConfig);
 
         return testNeo4j.run("MATCH (device:Device {uuid: {uuid}}), (otherDevice:Device {uuid: {otherUUID}}) DETACH DELETE device", {
@@ -86,6 +86,17 @@ describe("DB", function() {
                 })
                 .then(function(result) {
                     assert.equal(result["rels"], 1);
+                });
+        });
+    });
+    
+    describe("#getNicknamesOfPeers", function() { // TODO: Test this method when there are other peers connected to `otherTestDevice` and make sure the output always stays an array.
+        it("should nicknames of the device's directly connected peers", function() {
+            return testDatabase.getNicknamesOfPeers(testDevice, [otherTestDevice.UUID])
+                .then(function(peersNicknames) {
+                    assert.equal(Array.isArray(peersNicknames), true);
+                    assert.equal(peersNicknames[0], otherTestDevice.nickname);
+                    assert.equal(peersNicknames.length, 1);
                 });
         });
     });

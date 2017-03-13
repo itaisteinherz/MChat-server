@@ -19,7 +19,7 @@ io.on("connection", (socket) => {
     let connectionDevice, isValidSource;
 
     const userAgent = socket.request.headers["user-agent"]; // TODO: Check if I should lower case these strings. Also, move to using a RegExp.
-    isValidSource = userAgent.indexOf(config.client.appName) == 0 && userAgent.indexOf("Darwin") > -1; // TODO: Make sure that this is a valid check for the user agent. Also, check if I can convert this into a RegExp.
+    isValidSource = userAgent.indexOf(config.client.appName) === 0 && userAgent.indexOf("Darwin") != -1; // TODO: Make sure that this is a valid check for the user agent. Also, check if I can convert this into a RegExp.
 
     socket.on("device_connected", (data) => {
         connectionDevice = new Device(data);
@@ -58,13 +58,21 @@ io.on("connection", (socket) => {
             })
             .catch((err) => log(`Error sending message:\n${err}`));
     });
+    
+    socket.on("get_nicknames_of_peers", (data) => {
+        const socketDevice = new Device(data);
+        
+        database.getNicknamesOfPeers(socketDevice, data["peers"])
+            .then((result) => socket.emit("resolved_nicknames_of_peers", result["peersNicknames"]))
+            .catch((err) => log(`Error getting nicknames of peers:\n${err}`));
+    });
 
     socket.on("get_connected_peers_count", (data) => {
         const socketDevice = new Device(data);
 
         database.getConnectedPeersCount(socketDevice) // TODO: Fix issue where getting connected peers count fails because registration wasn't finished yet, and so the error is: "TypeError: Cannot read property 'passphrase' of undefined"
             .then((result) => socket.emit("resolved_peers_count", result["connectedPeers"]["low"]))
-            .catch((err) => log(`Error getting connected peers:\n${JSON.stringify(err, null, 2)}`));
+            .catch((err) => log(`Error getting connected peers:\n${err}`));
     });
 
     socket.on("get_connected_peers_nicknames", (data) => {

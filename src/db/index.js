@@ -22,7 +22,7 @@ module.exports = class DB {
         });
     }
 
-    changeNickname(device, newNickname) { // TODO: Check if I should accept the new nickname as another parameter, instead of accepting the updated device object.
+    changeNickname(device, newNickname) {
         return _runIfValidDevice(this.neo4j, device)
             .then(() => _changeNicknameForUUID(this.neo4j, device, newNickname));
     }
@@ -41,6 +41,22 @@ module.exports = class DB {
             });
     }
 
+    getNicknamesOfPeers(device, peersUUIDs) {
+        return _runIfValidDevice(this.neo4j, device)
+            .then(() => {
+                const peersStatement = `UNWIND {peersUUIDs} AS peerUUID
+                                        MATCH (device:Device {uuid: {uuid}}), (peer:Device {uuid: peerUUID}), (device)-[rel:SEES]->(peer)
+                                        WHERE NOT rel IS NULL
+                                        RETURN peer.nickname as peersNicknames`;
+                const peersParams = {
+                    uuid: device.UUID,
+                    peersUUIDs
+                };
+                
+                return this.neo4j.run(peersStatement, peersParams);
+            }).then((data) => Promise.resolve(_turnIntoArray(data, "peersNicknames")));
+    }
+    
     getConnectedPeers(device) {
         return _runIfValidDevice(this.neo4j, device)
             .then(() => {
@@ -70,7 +86,7 @@ module.exports = class DB {
 
                 return this.neo4j.run(peersStatement, peersParams);
             })
-            .then((data) => _turnIntoArray(data, "connectedPeersNicknames")); // TODO: Check if this is a good solution for returning the processed array.
+            .then((data) => Promise.resolve(_turnIntoArray(data, "connectedPeersNicknames"))); // TODO: Check if this is a good solution for returning the processed array.
     }
 
     getConnectedPeersCount(device) { // TODO: Convert this function to propper promise structure.
