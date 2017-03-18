@@ -45,16 +45,14 @@ module.exports = class DB {
         return _runIfValidDevice(this.neo4j, device)
             .then(() => {
                 const peersStatement = `UNWIND {peersUUIDs} AS peerUUID
-                                        MATCH (device:Device {uuid: {uuid}}), (peer:Device {uuid: peerUUID}), (device)-[rel:SEES]->(peer)
-                                        WHERE NOT rel IS NULL
+                                        MATCH (peer:Device {uuid: peerUUID})
                                         RETURN peer.nickname as peersNicknames`;
                 const peersParams = {
-                    uuid: device.UUID,
                     peersUUIDs
                 };
                 
                 return this.neo4j.run(peersStatement, peersParams);
-            }).then((data) => Promise.resolve(_turnIntoArray(data, "peersNicknames")));
+            }).then((data) => _turnIntoArray(data, "peersNicknames"));
     }
     
     getConnectedPeers(device) {
@@ -69,7 +67,7 @@ module.exports = class DB {
                 };
 
                 return this.neo4j.run(peersStatement, peersParams);
-            }).then((data) => Promise.resolve(_turnIntoArray(data, "connectedPeers")));
+            }).then((data) => _turnIntoArray(data, "connectedPeers"));
     }
 
     getConnectedPeersNicknames(device) {
@@ -86,7 +84,7 @@ module.exports = class DB {
 
                 return this.neo4j.run(peersStatement, peersParams);
             })
-            .then((data) => Promise.resolve(_turnIntoArray(data, "connectedPeersNicknames"))); // TODO: Check if this is a good solution for returning the processed array.
+            .then((data) => _turnIntoArray(data, "connectedPeersNicknames")); // TODO: Check if this is a good solution for returning the processed array.
     }
 
     getConnectedPeersCount(device) { // TODO: Convert this function to propper promise structure.

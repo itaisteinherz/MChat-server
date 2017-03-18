@@ -63,7 +63,7 @@ io.on("connection", (socket) => {
         const socketDevice = new Device(data);
         
         database.getNicknamesOfPeers(socketDevice, data["peers"])
-            .then((result) => socket.emit("resolved_nicknames_of_peers", result["peersNicknames"]))
+            .then((nicknames) => socket.emit("resolved_nicknames_of_peers", nicknames))
             .catch((err) => log(`Error getting nicknames of peers:\n${err}`));
     });
 
