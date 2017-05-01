@@ -8,7 +8,7 @@ const assert = require("assert");
 const http = require("http");
 const https = require("https");
 
-const Server = require("../src/server.js");
+const Server = require("../src/server");
 const serverConfig = require("../config")["server"];
 
 const pemP = pify(pem, Promise); // TODO: Check if the second argument is necessary
@@ -27,7 +27,7 @@ describe("Server", function() {
         })
             .then((caKeys) => {
                 const caRootKey = caKeys.serviceKey;
-                
+
                 caRootCert = caKeys.certificate;
 
                 return pemP.createCertificate({
@@ -48,7 +48,7 @@ describe("Server", function() {
                 sslOptions["cert"] = keys.certificate;
             });
     });
-    
+
     describe("#constructor(options)", function() {
         it("should return a new server object", function() {
             testServer = new Server(Object.assign({}, serverConfig, sslOptions));
@@ -61,16 +61,16 @@ describe("Server", function() {
     describe("#get load()", function() { // TODO: Add tests for the http -> https redirect
         it("should return the promise that resolves when the server was started successfully", function() {
             assert.equal(testServer.load instanceof Promise, true);
-            
+
             return testServer.load
                 .then(() => {
                     const testIO = io(testServer.httpsServer); // eslint-disable-line no-unused-vars
-                    
+
                     const client = socket(`https://localhost:${serverConfig["httpsPort"]}`, {
                         ca: caRootCert,
                         extraHeaders: {host}
                     });
-                    
+
                     return pify(client.on("connect"));
                 });
         });

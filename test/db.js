@@ -2,9 +2,9 @@ const { v4: uuid } = require("uuid");
 
 const assert = require("assert");
 
-const DB = require("../src/db/index.js");
-const Neo4j = require("../src/db/neo4j.js");
-const Device = require("../src/objects/device.js");
+const DB = require("../src/db/index");
+const Neo4j = require("../src/db/neo4j");
+const Device = require("../src/device");
 const databaseConfig = require("../config")["database"];
 
 let testNeo4j, testDatabase, testDevice, otherTestDevice;
@@ -89,7 +89,7 @@ describe("DB", function() {
                 });
         });
     });
-    
+
     describe("#getNicknamesOfPeers", function() { // TODO: Test this method when there are other peers connected to `otherTestDevice` and make sure the output always stays an array.
         it("should nicknames of the device's directly connected peers", function() {
             return testDatabase.getNicknamesOfPeers(testDevice, [otherTestDevice.UUID])

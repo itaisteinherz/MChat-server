@@ -1,6 +1,6 @@
 const assert = require("assert");
 
-const Device = require("../src/objects/device.js");
+const Device = require("../src/device");
 
 let testDevice, secondTestDevice;
 
@@ -65,18 +65,10 @@ describe("Device", function() {
     describe("#serialize()", function() {
         it("should return a JSON object containing all of the device's properties", function() {
             const serializedJSON = testDevice.serialize();
-            
+
             assert.equal(serializedJSON["nickname"], "newNickname");
             assert.equal(serializedJSON["UUID"], "newUUID");
             assert.equal(serializedJSON["passphrase"], "newPassphrase");
         });
     });
 });
-
-
-
-
-
-
-
-

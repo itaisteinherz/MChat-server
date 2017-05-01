@@ -1,7 +1,7 @@
 const assert = require("assert");
 
 const databaseConfig = require("../config")["database"];
-const Neo4j = require("../src/db/neo4j.js");
+const Neo4j = require("../src/db/neo4j");
 
 const testName = "Jon Stewart";
 

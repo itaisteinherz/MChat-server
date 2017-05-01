@@ -24,9 +24,6 @@
     "socket.io-client": "^1.7.3",
     "uuid": "^3.0.1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/itaisteinherz/MChat-server.git"
-  },
+  "repository": "itaisteinherz/MChat-server",
   "author": "Itai Steinherz <itaisteinherz@gmail.com>"
 }

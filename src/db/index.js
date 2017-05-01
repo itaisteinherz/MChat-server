@@ -1,4 +1,4 @@
-const Neo4j = require("./neo4j.js");
+const Neo4j = require("./neo4j");
 
 // DB class
 
@@ -50,11 +50,11 @@ module.exports = class DB {
                 const peersParams = {
                     peersUUIDs
                 };
-                
+
                 return this.neo4j.run(peersStatement, peersParams);
             }).then((data) => _turnIntoArray(data, "peersNicknames"));
     }
-    
+
     getConnectedPeers(device) {
         return _runIfValidDevice(this.neo4j, device)
             .then(() => {
@@ -74,7 +74,7 @@ module.exports = class DB {
         return _runIfValidDevice(this.neo4j, device)
             .then(() => {
                 const peersStatement = `MATCH (device:Device {uuid: {uuid}})
-                                        OPTIONAL MATCH (device)-[:SEES*]-(devices) 
+                                        OPTIONAL MATCH (device)-[:SEES*]-(devices)
                                         WHERE NOT devices.uuid = {uuid}
                                         WITH DISTINCT devices AS peers
                                         RETURN peers.nickname AS connectedPeersNicknames`; // TODO: Check if the OPTIONAL keyword is needed.
