@@ -8,7 +8,7 @@
     "start": "node src/index.js",
     "start-forever": "forever start src/index.js",
     "lint": "eslint .",
-    "test": "npm run lint; mocha --harmony"
+    "test": "npm run lint && mocha --harmony"
   },
   "dependencies": {
     "express": "^4.14.0",
@@ -17,12 +17,14 @@
   },
   "devDependencies": {
     "eslint": "^3.12.2",
-    "forever": "^0.15.3",
     "mocha": "^3.2.0",
     "pem": "^1.9.4",
     "pify": "^2.3.0",
     "socket.io-client": "^1.7.3",
     "uuid": "^3.0.1"
+  },
+  "optionalDependencies": {
+    "forever": "^0.15.3"
   },
   "repository": "itaisteinherz/MChat-server",
   "author": "Itai Steinherz <itaisteinherz@gmail.com>"
