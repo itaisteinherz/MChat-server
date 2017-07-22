@@ -1,6 +1,6 @@
 const Server = require("./server");
 const DB = require("./db/index");
-const Device = require(".device");
+const Device = require("./device");
 const log = require("./log");
 
 const config = require("../config");
