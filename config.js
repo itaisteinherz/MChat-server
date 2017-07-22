@@ -5,20 +5,20 @@ const keyPath = "certs/privkey.pem";
 const certPath = "certs/fullchain.pem";
 
 module.exports = {
-    client: {
-        appName: "MChat"
-    },
-    server: {
-        httpPort: 1080,
-        httpsPort: 1443,
-        key: readFile(keyPath),
-        cert: readFile(certPath)
-    },
-    database: {
-        username: "neo4j",
-        password: "admin",
-        url: "bolt://localhost"
-    }
+	client: {
+		appName: "MChat"
+	},
+	server: {
+		httpPort: 1080,
+		httpsPort: 1443,
+		key: readFile(keyPath),
+		cert: readFile(certPath)
+	},
+	database: {
+		username: "neo4j",
+		password: "admin",
+		url: "bolt://localhost"
+	}
 };
 
 function readFile(pathToFile) {

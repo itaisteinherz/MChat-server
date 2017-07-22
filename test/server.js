@@ -20,71 +20,73 @@ let caRootCert;
 let sslOptions = {};
 
 describe("Server", function() {
-    before("create ssl key and cert", function() {
-        return pemP.createCertificate({
-            days: 1,
-            selfSigned: true
-        })
-            .then((caKeys) => {
-                const caRootKey = caKeys.serviceKey;
+	before("create ssl key and cert", function() {
+		const certOpts = {
+			days: 1,
+			selfSigned: true
+		};
 
-                caRootCert = caKeys.certificate;
+		return pemP.createCertificate(certOpts)
+			.then(caKeys => {
+				const caRootKey = caKeys.serviceKey;
 
-                return pemP.createCertificate({
-                    serviceCertificate: caRootCert,
-                    serviceKey: caRootKey,
-                    serial: Date.now(),
-                    days: 500,
-                    country: "",
-                    state: "",
-                    locality: "",
-                    organization: "",
-                    organizationUnit: "",
-                    commonName: host
-                });
-            })
-            .then((keys) => {
-                sslOptions["key"] = keys.clientKey;
-                sslOptions["cert"] = keys.certificate;
-            });
-    });
+				caRootCert = caKeys.certificate;
 
-    describe("#constructor(options)", function() {
-        it("should return a new server object", function() {
-            testServer = new Server(Object.assign({}, serverConfig, sslOptions));
-            assert.equal(testServer instanceof Server, true);
+				return pemP.createCertificate({
+					serviceCertificate: caRootCert,
+					serviceKey: caRootKey,
+					serial: Date.now(),
+					days: 500,
+					country: "",
+					state: "",
+					locality: "",
+					organization: "",
+					organizationUnit: "",
+					commonName: host
+				});
+			})
+			.then(keys => {
+				sslOptions["key"] = keys.clientKey;
+				sslOptions["cert"] = keys.certificate;
+			});
+	});
 
-            return testServer.load;
-        });
-    });
+	describe("#constructor(options)", function() {
+		it("should return a new server object", function() {
+			testServer = new Server(Object.assign({}, serverConfig, sslOptions));
+			assert.equal(testServer instanceof Server, true);
 
-    describe("#get load()", function() { // TODO: Add tests for the http -> https redirect
-        it("should return the promise that resolves when the server was started successfully", function() {
-            assert.equal(testServer.load instanceof Promise, true);
+			return testServer.load;
+		});
+	});
 
-            return testServer.load
-                .then(() => {
-                    const testIO = io(testServer.httpsServer); // eslint-disable-line no-unused-vars
+	describe("#get load()", function() { // TODO: Add tests for the http -> https redirect
+		it("should return the promise that resolves when the server was started successfully", function() {
+			assert.equal(testServer.load instanceof Promise, true);
 
-                    const client = socket(`https://localhost:${serverConfig["httpsPort"]}`, {
-                        ca: caRootCert,
-                        extraHeaders: {host}
-                    });
+			return testServer.load
+				.then(() => {
+					const testIO = io(testServer.httpsServer); // eslint-disable-line no-unused-vars
 
-                    return pify(client.on("connect"));
-                });
-        });
-    });
+					const client = socket(`https://localhost:${serverConfig["httpsPort"]}`, {
+						ca: caRootCert,
+						extraHeaders: {host}
+					});
 
-    describe("#get httpServer()", function() {
-        it("should return the http server", function() {
-            assert.equal(testServer.httpServer instanceof http.Server, true);
-        });
-    });
+					return pify(client.on("connect"));
+				});
+		});
+	});
 
-    describe("#get httpsServer()", function() {
-        it("should return the https server", function() {
-            assert.equal(testServer.httpsServer instanceof https.Server, true);
-        });
-    });
+	describe("#get httpServer()", function() {
+		it("should return the http server", function() {
+			assert.equal(testServer.httpServer instanceof http.Server, true);
+		});
+	});
+
+	describe("#get httpsServer()", function() {
+		it("should return the https server", function() {
+			assert.equal(testServer.httpsServer instanceof https.Server, true);
+		});
+	});
 });
