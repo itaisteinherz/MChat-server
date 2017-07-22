@@ -22,9 +22,8 @@ module.exports = {
 };
 
 function readFile(pathToFile) {
-    if (fs.existsSync(path.join(__dirname, pathToFile))) {
-        return fs.readFileSync(path.join(__dirname, pathToFile), {encoding: "utf8"});
-    } else {
-        return "";
-    } 
+	const joinedPath = path.join(__dirname, pathToFile);
+	const pathExists = fs.existsSync(joinedPath);
+
+	return pathExists ? fs.readFileSync(joinedPath, {encoding: "utf8"}) : "";
 }
