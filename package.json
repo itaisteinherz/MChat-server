@@ -3,6 +3,7 @@
   "private": true,
   "version": "1.0.3",
   "description": "The server side for the MChat app",
+  "license": "MIT",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
