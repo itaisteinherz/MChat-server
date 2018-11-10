@@ -5,6 +5,9 @@
   "description": "The server side for the MChat app",
   "license": "MIT",
   "main": "src/index.js",
+  "engines": {
+		"node": ">=4"
+	},
   "scripts": {
     "start": "node src/index.js",
     "start-forever": "forever start src/index.js",
